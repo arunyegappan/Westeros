@@ -1,4 +1,4 @@
-function movePlayerInUi(playerId,moveTo)
+function movePlayerInUi(playerId,moveFrom,moveTo)
 {   
     document.getElementById(moveTo).appendChild( document.getElementById('player'+playerId));
 }
@@ -23,9 +23,9 @@ function animateMovement(playerId,diceNumber) {
   }
 }
 
-function toggleRollButton()
+function toggleRollButton(dbResponse)
 {
-  if(dbResponse.nextTurn == sessionStorage.playerId)
+  if(dbResponse.nextTurn == Number(sessionStorage.playerId))
         {
           return false;
         }

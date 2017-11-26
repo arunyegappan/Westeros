@@ -25,20 +25,26 @@ app.controller("myCtrl", function($scope) {
         sessionStorage.playerId = data.playerId;
         sessionStorage.gameId = data.gameId;
         dbResponse = data.dbResponse;
-        $scope.balance = dbResponse.players[Number(sessionStorage.playerId)-1].balance;
-        $scope.networth = dbResponse.players[Number(sessionStorage.playerId)-1].networth;
-        $scope.disableButton = toggleRollButton();
+        updateBoard(dbResponse);
         if($scope.disableButton)
           rotateBoard(document.getElementById('gameboard'),180);
-        $scope.message = "Game Started! "+getNextTurn($scope.disableButton)+" turn";        
-        $scope.$apply();
-    });
+       });
     
     socket.on('move',function(data){
-      console.log('move player'+data.playerId+' : ' + data.diceNumber);
+      console.log(data);
       //animateMovement(data.playerId,data.diceNumber);
-      movePlayerInUi(data.playerId,data.diceNumber);
+      dbResponse = data.dbResponse;
+      movePlayerInUi(data.movePlayer,data.from,data.to);;
+      updateBoard(dbResponse);
   });
+
+    updateBoard = function(dbResponse){
+        $scope.balance = dbResponse.players[Number(sessionStorage.playerId)-1].balance;
+        $scope.networth = dbResponse.players[Number(sessionStorage.playerId)-1].networth;
+        $scope.disableButton = toggleRollButton(dbResponse);
+        $scope.message = getNextTurn($scope.disableButton)+" turn";        
+        $scope.$apply();
+    }
 
 });
 
