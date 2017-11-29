@@ -34,9 +34,24 @@ app.controller("myCtrl", function($scope) {
       console.log(data);
       //animateMovement(data.playerId,data.diceNumber);
       dbResponse = data.dbResponse;
-      movePlayerInUi(data.movePlayer,data.from,data.to);;
+      movePlayerInUi(data.playerId,data.from,data.to);
       updateBoard(dbResponse);
-  });
+      if(data.playerId == sessionStorage.playerId)
+      {
+        if(data.requestAction)
+          {
+            //create popup
+            socket.emit('buy',{playerId: sessionStorage.playerId,answer:"yes"});
+          }
+      }
+    });
+
+    socket.on('nextPlayerTurn',function(data){
+      console.log(data);
+      //animateMovement(data.playerId,data.diceNumber);
+      dbResponse = data.dbResponse;
+      updateBoard(dbResponse);
+    });
 
     updateBoard = function(dbResponse){
         $scope.balance = dbResponse.players[Number(sessionStorage.playerId)-1].balance;
