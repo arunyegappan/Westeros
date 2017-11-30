@@ -72,17 +72,13 @@ io.sockets.on('connection', function(socket) {
       socket.disconnect();
       removePlayer(socket.id);
    });
-
-
-  
-
 });
 
 
 function processRollDice(response,socketData){
         dbResponse = JSON.parse(response);
-        playerId = socketData.playerId;
-        var diceNumber = randomIntFromInterval(2,6);
+        playerId = Number(socketData.playerId);
+        var diceNumber = randomIntFromInterval(1,5);
         var action="none";
         var from = dbResponse.players[playerId-1].currentPositionInBoard;
         var nextPosition = dbResponse.players[playerId-1].currentPositionInBoard = findNextPositionInBoard(dbResponse,playerId,diceNumber)    
@@ -99,23 +95,35 @@ function processRollDice(response,socketData){
                       break;
             case playerId:
                       console.log("you are the owner. Do you want to build?");
-                      requestAction = true;
+                      requestAction = false;
                       action="build";
-                      dbResponse.nextTurn = "noone";
+                      dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
                       break;
             default:
+                      console.log("some one else's property");
                       dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
                       requestAction = false;
-                      console.log("some one else's property");
+                      var rent= property.rent[property.currentState];
+                      dbResponse.players[playerId-1].balance -= rent;
+                      dbResponse.players[playerId-1].networth -= rent;
+                      dbResponse.players[property.owner-1].balance += rent;
+                      dbResponse.players[property.owner-1].networth += rent;
           }
         }
         else
         {
+          //TODO
           //logic for valar morgulis, jail and non-color properties
+          //add cases for each seperately -> if property.name == "gotojail"
+          //if jail reduce bal and nw by 50
+          //else for valar mrogulis and dohar randomely reduce or add random amount from net and bal
+          
           requestAction = false;
           dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
         }
 
+        //todo
+        //if player cross start(id : 1), add 200 to bal and nw
         //console.log(dbResponse);
         updateDocument(gameId, dbResponse);
         io.sockets.emit('move', { requestAction: requestAction,action:action, from:from,to:nextPosition,playerId : playerId, diceNumber:diceNumber, dbResponse: dbResponse });
@@ -131,7 +139,7 @@ function processBuyProperty(response,socketData){
         var property = getProperty(dbResponse,currentPosition); 
         
         dbResponse.players[playerId-1].balance -= property.value;
-        dbResponse.players[playerId-1].networth += property.value;
+        //dbResponse.players[playerId-1].networth += property.value;
         dbResponse.properties[currentPosition-1].owner = playerId;
     }
     dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
@@ -252,7 +260,7 @@ function getInitialDb()
     "color": "none",
     "value" : 0,
     "buildValue": 0,
-    "rent": [0],
+    "rent": [10, 100, 200, 300],
     "currentState": 0
   },{
     "id": 2,
@@ -297,7 +305,7 @@ function getInitialDb()
     "color": "none",
     "value" : 0,
     "buildValue": 0,
-    "rent": [50],
+    "rent": [10, 100, 200, 300],
     "currentState": 0
   },{
     "id": 7,
@@ -369,7 +377,7 @@ function getInitialDb()
     "color": "none",
     "value" : 0,
     "buildValue": 0,
-    "rent": [50],
+    "rent": [10, 100, 200, 300],
     "currentState": 0
   },{
     "id": 15,
@@ -387,7 +395,7 @@ function getInitialDb()
     "color": "none",
     "value" : 0,
     "buildValue": 100,
-    "rent": [50],
+    "rent": [10, 100, 200, 300],
     "currentState": 0
   },{
     "id": 17,
@@ -414,7 +422,7 @@ function getInitialDb()
     "color": "none",
     "value" : 0,
     "buildValue": 0,
-    "rent": [50],
+    "rent": [10, 100, 200, 300],
     "currentState": 0
   },{
     "id": 20,

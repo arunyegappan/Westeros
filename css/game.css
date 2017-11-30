@@ -5,30 +5,54 @@
 
  #player1,#player2 {
   width: 60px;
-  height: 67px;
+  height: 60px;
   position: relative;
   float:left;
   }
 
   .player1_up{
-  background:  url('../images/blue.png') no-repeat 0 0%;
+  background:  url('../images/blueup.png') no-repeat 0 0%;
   }
 
   .player2_up {
-  background:  url('../images/blue.png') no-repeat 0 0%;
+  background:  url('../images/blueup.png') no-repeat 0 0%;
+  }
+
+  .player1_right{
+  background:  url('../images/blueright.png') no-repeat 0 0%;
+  }
+
+  .player2_right {
+  background:  url('../images/blueright.png') no-repeat 0 0%;
+  }
+
+  .player1_down{
+  background:  url('../images/bluedown.png') no-repeat 0 0%;
+  }
+
+  .player2_down {
+  background:  url('../images/bluedown.png') no-repeat 0 0%;
+  }
+
+  .player1_left{
+  background:  url('../images/blueleft.png') no-repeat 0 0%;
+  }
+
+  .player2_left{
+  background:  url('../images/blueleft.png') no-repeat 0 0%;
   }
 
 
-  .animation_down
+  .animation
   {
-  animation: try 1s steps(4) infinite ;
+  animation: try 1s steps(3) infinite ;
   animation-fill-mode: forwards;  
   }
   
   @keyframes try
   {
   0%{background-position: 0px 0px;}
-  99%{background-position: -237px 0px;}
+  99%{background-position: -180px 0px;}
   100%{}
   }
 
@@ -41,6 +65,11 @@
    width:800px;
    background-image: url('../images/board.jpg');
    border: 1px solid white;
+   position: relative;
+   float: left;
+   margin-left: 15px;
+   margin-top: 10px;
+
    }
 
 .corner
@@ -72,4 +101,72 @@
   width:560px;
   
 }
+
+#dialogdiv
+  {
+      display: none;
+      background-color: #eee;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+      position: absolute;
+      width: 300px;
+      left: 20%;
+      padding: 6px 8px 8px;
+      box-sizing: border-box;
+      text-align: center;
+  }
+  #dialogdiv button {
+      background-color: #ccc;
+      display: inline-block;
+      border-radius: 3px;
+      border: 1px solid #aaa;
+      padding: 2px;
+      text-align: center;
+      width: 80px;
+      cursor: pointer;
+  }
+  #dialogdiv button:hover
+  {
+      background-color: #ddd;
+  }
+  #confirmBox .message
+  {
+      text-align: left;
+      margin-bottom: 8px;
+  }
+
+#playerboard {margin-left: 20px;float: left;margin-top: 10px;}
+
+#balance,#balance2 {background-color:#FFB347;width:230px;height:30px;overflow:hidden;}
+
+#networth, #networth2 {background-color:#77DD77;width:230px;height:30px;overflow:hidden;}
+#properties, #properties2 {background-color:burlywood;width:230px;height:30px;overflow:hidden;}
+#message, #message2 {background-color:#93CCEA;width:230px;height:45px;overflow:hidden;}
+
+.box
+{
+  border: 1px solid white;
+  width: 49%;
+  float: left;
+  text-align: center;
+}
+
+#showPropertiesDialog
+{
+  display: none;
+  border: 1px solid white;
+  margin-right:185px;padding:0;overflow:hidden;resize:none;margin-top: 10px;
+  width: 230px;
+  height: 290px;
+  clear: both;
+
+}
+
+#properties2 {
+  text-decoration: underline;
+  cursor: pointer;
+
+}
+
+
 

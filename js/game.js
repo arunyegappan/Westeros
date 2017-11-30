@@ -6,10 +6,16 @@ app.controller("myCtrl", function($scope) {
       $scope.message = "";
       $scope.balance = 0;
       $scope.networth = 0;
+      $scope.properties = 0;
       
       $scope.rollDice = function(){
          console.log('rolling the dice');
          socket.emit('rollDice', { playerId: sessionStorage.playerId }); 
+    }
+
+    $scope.showProperties = function()
+    {      
+          showPropertiesPopup();
     }
     //Game cannot start. Have to wait until server tells me to start.
     //disable roll button
@@ -26,24 +32,21 @@ app.controller("myCtrl", function($scope) {
         sessionStorage.gameId = data.gameId;
         dbResponse = data.dbResponse;
         updateBoard(dbResponse);
-        if($scope.disableButton)
+        /*if($scope.disableButton)
+        {
           rotateBoard(document.getElementById('gameboard'),180);
+          rotateBoard(document.getElementById('dialogdiv'),180);
+        }*/
        });
     
     socket.on('move',function(data){
       console.log(data);
       //animateMovement(data.playerId,data.diceNumber);
       dbResponse = data.dbResponse;
-      movePlayerInUi(data.playerId,data.from,data.to);
-      updateBoard(dbResponse);
-      if(data.playerId == sessionStorage.playerId)
-      {
-        if(data.requestAction)
-          {
-            //create popup
-            socket.emit('buy',{playerId: sessionStorage.playerId,answer:"yes"});
-          }
-      }
+
+      animateMovement(data.playerId,data.from,data.to,data.diceNumber,dbResponse,data.requestAction);
+      //processPlayerLanding(data.playerId,data.from,data.to,dbResponse,data.requestAction);
+      
     });
 
     socket.on('nextPlayerTurn',function(data){
@@ -57,7 +60,8 @@ app.controller("myCtrl", function($scope) {
         $scope.balance = dbResponse.players[Number(sessionStorage.playerId)-1].balance;
         $scope.networth = dbResponse.players[Number(sessionStorage.playerId)-1].networth;
         $scope.disableButton = toggleRollButton(dbResponse);
-        $scope.message = getNextTurn($scope.disableButton)+" turn";        
+        $scope.message = getNextTurn($scope.disableButton)+" turn";  
+        $scope.properties = getProperties(dbResponse);       
         $scope.$apply();
     }
 
