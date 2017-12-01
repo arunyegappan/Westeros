@@ -273,3 +273,18 @@ function createBox(message){
     return false;
 }
 }
+
+
+var dices = ['&#9856;', '&#9857;', '&#9858;', '&#9859;', '&#9860;' ];
+var t;
+
+function change() {
+  var random = Math.floor(Math.random()*5);
+  dice = document.getElementById("dice");
+  dice.innerHTML = dices[random]; 
+}
+
+function stopstart() {
+    t = setInterval(change, 100); 
+  
+}

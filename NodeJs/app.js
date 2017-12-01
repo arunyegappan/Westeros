@@ -78,32 +78,37 @@ io.sockets.on('connection', function(socket) {
 function processRollDice(response,socketData){
         dbResponse = JSON.parse(response);
         playerId = Number(socketData.playerId);
-        var diceNumber = randomIntFromInterval(1,5);
+        if(Number(socketData.rollNumber) == 0)
+          var diceNumber = randomIntFromInterval(2,5);
+        else
+          var diceNumber = Number(socketData.rollNumber);
         var action="none";
         var from = dbResponse.players[playerId-1].currentPositionInBoard;
         var nextPosition = dbResponse.players[playerId-1].currentPositionInBoard = findNextPositionInBoard(dbResponse,playerId,diceNumber)    
         var property = getProperty(dbResponse,nextPosition);
+        var message = "";
         if(property.color!="none")
         {
           switch(property.owner)
           {
             case "noone":
-                      console.log("noone. Do you want to buy?");
+                      
                       requestAction = true;
                       action="buy";
                       dbResponse.nextTurn = "noone";
                       break;
             case playerId:
-                      console.log("you are the owner. Do you want to build?");
+                      message = "player"+playerId+" Landing at his property. He is safe.";
                       requestAction = false;
                       action="build";
                       dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
                       break;
             default:
-                      console.log("some one else's property");
+                      
                       dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
                       requestAction = false;
                       var rent= property.rent[property.currentState];
+                      message = "player"+playerId+" paid rent of $"+rent+" to player"+property.owner;
                       dbResponse.players[playerId-1].balance -= rent;
                       dbResponse.players[playerId-1].networth -= rent;
                       dbResponse.players[property.owner-1].balance += rent;
@@ -112,21 +117,77 @@ function processRollDice(response,socketData){
         }
         else
         {
-          //TODO
-          //logic for valar morgulis, jail and non-color properties
-          //add cases for each seperately -> if property.name == "gotojail"
-          //if jail reduce bal and nw by 50
-          //else for valar mrogulis and dohar randomely reduce or add random amount from net and bal
-          
+            //logic for valar morgulis, jail and non-color properties
+            if(property.name == "gotojail") {
+                message = "You have landed in Jail. Pay $50 fine to get out of jail";
+                //for jail reduce bal and nw by 50
+                dbResponse.players[playerId-1].balance -= 50;
+                dbResponse.players[playerId-1].networth -= 50;
+            } else if(property.name == "valarmorghulis") {
+                var luckyDraw = Math.floor(Math.random()*(4)+1);
+                switch(luckyDraw)
+                {
+                  case 1:
+                      message = "Valarmorghulis. Unexpected Hospital Charges $50";
+                      dbResponse.players[playerId-1].balance -= 50;
+                      dbResponse.players[playerId-1].networth -= 50;
+                      break;
+                  case 2:
+                      message = "Valarmorghulis. You have been elected as Warden of the North. Pay $50";
+                      dbResponse.players[playerId-1].balance -= 100;
+                      dbResponse.players[playerId-1].networth -= 100;
+                      break;
+                  case 3:
+                      message = "Valarmorghulis. You have won a lucky draw of Iron Bank. Collect $50";
+                      dbResponse.players[playerId-1].balance += 50;
+                      dbResponse.players[playerId-1].networth += 50;
+                      break;
+                  case 4:
+                      message = "Valarmorghulis. You have won the battle. Collect $100";
+                      dbResponse.players[playerId-1].balance += 100;
+                      dbResponse.players[playerId-1].networth += 100;
+                      break; 
+                }               
+            } else if(property.name == "valardohaeris" ) {
+                var luckyDraw = Math.floor(Math.random()*(4)+1);
+                switch(luckyDraw)
+                {
+                  case 1:
+                      message = "Valardohaeris. Make general repairs on your property – Pay $50";
+                      dbResponse.players[playerId-1].balance -= 50;
+                      dbResponse.players[playerId-1].networth -= 50;
+                      break;
+                  case 2:
+                      message = "Valardohaeris. You lost a battle. Pay $100";
+                      dbResponse.players[playerId-1].balance -= 100;
+                      dbResponse.players[playerId-1].networth -= 100;
+                      break;
+                  case 3:
+                      message = "Valardohaeris. You have won a token. Collect $50";
+                      dbResponse.players[playerId-1].balance += 50;
+                      dbResponse.players[playerId-1].networth += 50;
+                      break;
+                  case 4:
+                      message = "Valardohaeris. You have won a dragon egg. Collect $100";
+                      dbResponse.players[playerId-1].balance += 100;
+                      dbResponse.players[playerId-1].networth += 100;
+                      break; 
+                }     
+            }
           requestAction = false;
           dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
         }
 
         //todo
         //if player cross start(id : 1), add 200 to bal and nw
+        if (from > nextPosition) {
+            console.log("congrats you have completed a round")
+            dbResponse.players[playerId-1].balance += 200;
+            dbResponse.players[playerId-1].networth += 200;
+        }
         //console.log(dbResponse);
         updateDocument(gameId, dbResponse);
-        io.sockets.emit('move', { requestAction: requestAction,action:action, from:from,to:nextPosition,playerId : playerId, diceNumber:diceNumber, dbResponse: dbResponse });
+        io.sockets.emit('move', { requestAction: requestAction,action:action,message:message, from:from,to:nextPosition,playerId : playerId, diceNumber:diceNumber, dbResponse: dbResponse });
     }
 
 function processBuyProperty(response,socketData){
@@ -141,10 +202,14 @@ function processBuyProperty(response,socketData){
         dbResponse.players[playerId-1].balance -= property.value;
         //dbResponse.players[playerId-1].networth += property.value;
         dbResponse.properties[currentPosition-1].owner = playerId;
+        message = "player"+playerId+" bought "+property.name;
+    }
+    else{
+      message = "player"+playerId+" skipped buying "+property.name;
     }
     dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
     updateDocument(gameId, dbResponse);
-    io.sockets.emit('nextPlayerTurn',{dbResponse:dbResponse});
+    io.sockets.emit('nextPlayerTurn',{dbResponse:dbResponse,message:message,});
 }
 
 function findNextTurn(dbResponse,playerId){
@@ -154,15 +219,14 @@ function findNextTurn(dbResponse,playerId){
 function findNextPositionInBoard(dbResponse,playerId,diceNumber){
   var newPosition;
   dbResponse.players.forEach(function(player){
-          if (player.id == playerId) {
-            //TODO: do updates here
-            newPosition = player.currentPositionInBoard + diceNumber;
-            if(newPosition > 26) {
-              newPosition = newPosition - 26;
-            } 
-          }
-        });
-
+    if (player.id == playerId) {
+      //TODO: do updates here
+      newPosition = player.currentPositionInBoard + diceNumber;
+      if(newPosition > 26) {
+        newPosition = newPosition - 26;
+      } 
+    }
+  });
   return newPosition;
 }
 

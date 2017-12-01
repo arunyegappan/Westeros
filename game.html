@@ -35,7 +35,9 @@
 		<div class="middle"></div>
 		<div class="vertical" id="17"></div>
 		<div class="vertical" id="2"></div>
-		<div class="middle"></div>
+		<div class="middle">
+		<div id="dice" ng-click="rollDice()" ng-disabled=disableButton style="cursor:pointer;" title="Roll Your Dice"></div>
+		</div>
 		<div class="vertical" id="18"></div>
 		<div class="corner" id="1">
 			<div id="player1" class="player1_up"></div>
@@ -72,8 +74,13 @@
 			<div id="message">MESSAGE</div>
 			<div id="message2">{{message}}</div>
 		</div>
-		<input type="button" value="roll" ng-click="rollDice()" ng-disabled=disableButton style="cursor:pointer;" title="Roll Your Dice"/>
-
+		<div>
+			<div id="commentary">COMMENTARY</div>
+			<div id="commentary2">{{commentary}}</div>
+		</div>
+		<div>
+            <input type ="text" value ="0" id = "textbox"/>
+        </div>
 		<div id="showPropertiesDialog">You don't own any properties.
 		</div>
 		</div>

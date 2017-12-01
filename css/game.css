@@ -11,35 +11,35 @@
   }
 
   .player1_up{
-  background:  url('../images/blueup.png') no-repeat 0 0%;
+  background:  url('../images/redup.png') no-repeat 0 0%;
   }
 
   .player2_up {
-  background:  url('../images/blueup.png') no-repeat 0 0%;
+  background:  url('../images/greenup.png') no-repeat 0 0%;
   }
 
   .player1_right{
-  background:  url('../images/blueright.png') no-repeat 0 0%;
+  background:  url('../images/redright.png') no-repeat 0 0%;
   }
 
   .player2_right {
-  background:  url('../images/blueright.png') no-repeat 0 0%;
+  background:  url('../images/greenright.png') no-repeat 0 0%;
   }
 
   .player1_down{
-  background:  url('../images/bluedown.png') no-repeat 0 0%;
+  background:  url('../images/reddown.png') no-repeat 0 0%;
   }
 
   .player2_down {
-  background:  url('../images/bluedown.png') no-repeat 0 0%;
+  background:  url('../images/greendown.png') no-repeat 0 0%;
   }
 
   .player1_left{
-  background:  url('../images/blueleft.png') no-repeat 0 0%;
+  background:  url('../images/redleft.png') no-repeat 0 0%;
   }
 
   .player2_left{
-  background:  url('../images/blueleft.png') no-repeat 0 0%;
+  background:  url('../images/greenleft.png') no-repeat 0 0%;
   }
 
 
@@ -105,15 +105,18 @@
 #dialogdiv
   {
       display: none;
-      background-color: #eee;
       border-radius: 5px;
       border: 1px solid #aaa;
-      position: absolute;
       width: 300px;
-      left: 20%;
       padding: 6px 8px 8px;
       box-sizing: border-box;
       text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+      color: white;
+      font-weight: bold;
+      background-color: #191919;
+      font-family: verdana;
   }
   #dialogdiv button {
       background-color: #ccc;
@@ -135,13 +138,23 @@
       margin-bottom: 8px;
   }
 
-#playerboard {margin-left: 20px;float: left;margin-top: 10px;}
+#playerboard {font-family: verdana;margin-left: 20px;float: left;margin-top: 10px;width: 230px;border: 1px solid #191919;background-color: #191919;text-align: center;}
 
-#balance,#balance2 {background-color:#FFB347;width:230px;height:30px;overflow:hidden;}
+#balance,#balance2 {width:230px;height:30px;overflow:hidden;}
 
-#networth, #networth2 {background-color:#77DD77;width:230px;height:30px;overflow:hidden;}
-#properties, #properties2 {background-color:burlywood;width:230px;height:30px;overflow:hidden;}
-#message, #message2 {background-color:#93CCEA;width:230px;height:45px;overflow:hidden;}
+#networth, #networth2 {width:230px;height:30px;overflow:hidden;}
+#properties, #properties2 {width:230px;height:30px;overflow:hidden;}
+#message, #message2,#commentary,#commentary2 {width:230px;height:45px;overflow:hidden;}
+
+#commentary2{
+  height:60px;
+}
+
+#networth2,#properties2,#message2,#balance2,#commentary2 {
+    background-color: black;
+    
+}
+
 
 .box
 {
@@ -168,5 +181,21 @@
 
 }
 
+#dice {
+      font-size: 134px;
+    /* height: 80px; */
+    float: right;
+    padding: 0px;
+    margin: 0px;
+    position: relative;
+    left: 10px;
+    top: -58px;
+}
+#dice:hover {
+  cursor: pointer;
+}
 
-
+@font-face {
+    font-family: Game of Thrones;
+    src: url('Game of Thrones.ttf');
+}
