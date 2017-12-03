@@ -22,6 +22,17 @@ app.use(function(req, res, next) {
     next();
 });
 
+app.get('/alexa', function (req, res, next) {
+console.log("request from alexa. Yayyy");
+ response = {
+      message:'Rolling the dice'      
+   };
+res.send(response);
+data = { playerId: '1', rollNumber: '0' }
+
+getDocumentFromDb(gameId, processRollDice,data);
+});
+
 
 server.listen(8080, function() {
   console.log('Server running at http://127.0.0.1:8080/');
@@ -54,6 +65,9 @@ io.sockets.on('connection', function(socket) {
   //socket request handlers
 
   socket.on('rollDice', function (data) {
+    console.log("**********");
+    console.log(data);
+    console.log("**********");
       getDocumentFromDb(gameId, processRollDice,data);
     });
 
@@ -304,15 +318,15 @@ function getInitialDb()
   "nextTurn": "1",
   "players": [{
       "id": 1,
-      "balance": 1500,
-      "networth": 1500,
+      "balance": 5000,
+      "networth": 5000,
       "status": "playing",
       "currentPositionInBoard": 1
     },
     {
       "id": 2,
-      "balance": 1500,
-      "networth": 1500,
+      "balance": 5000,
+      "networth": 5000,
       "status": "playing",
       "currentPositionInBoard": 1
     }
