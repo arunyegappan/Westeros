@@ -7,7 +7,7 @@ var gameId;
 var dbResponse;
 var ObjectID = require('mongodb').ObjectID;
 var requestAction = false;
-
+var isAlexa = false;
 //Handle from post data
 var bodyParser = require('body-parser');
 var connections = [];
@@ -29,7 +29,7 @@ console.log("request from alexa. Yayyy");
    };
 res.send(response);
 data = { playerId: '1', rollNumber: '0' }
-
+isAlexa = true;
 getDocumentFromDb(gameId, processRollDice,data);
 });
 
@@ -55,19 +55,22 @@ io.sockets.on('connection', function(socket) {
     });
     
   }
-  else
+  else if(connections.length < numberOfConnections)
   {
     //tell the connected client to wait until other players join
     console.log('waiting for more players to join');
     socket.emit("wait");
   }
+  else{
+    console.log('already two players playing. Please wait');
+    socket.emit("gamefull");
+  }
 
   //socket request handlers
 
   socket.on('rollDice', function (data) {
-    console.log("**********");
-    console.log(data);
-    console.log("**********");
+    
+      isAlexa = false;
       getDocumentFromDb(gameId, processRollDice,data);
     });
 
@@ -201,17 +204,20 @@ function processRollDice(response,socketData){
         }
         //console.log(dbResponse);
         updateDocument(gameId, dbResponse);
+        if(isAlexa){
+          message = "Triggered through Alexa" + message;
+        }
         io.sockets.emit('move', { requestAction: requestAction,action:action,message:message, from:from,to:nextPosition,playerId : playerId, diceNumber:diceNumber, dbResponse: dbResponse });
     }
 
 function processBuyProperty(response,socketData){
     dbResponse = JSON.parse(response);
     playerId = socketData.playerId;   
-
+    var currentPosition = dbResponse.players[playerId-1].currentPositionInBoard 
+    var property = getProperty(dbResponse,currentPosition); 
+        
     if(socketData.answer=="yes")
     {
-        var currentPosition = dbResponse.players[playerId-1].currentPositionInBoard 
-        var property = getProperty(dbResponse,currentPosition); 
         
         dbResponse.players[playerId-1].balance -= property.value;
         //dbResponse.players[playerId-1].networth += property.value;
