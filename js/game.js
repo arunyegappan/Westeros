@@ -226,21 +226,19 @@ function drawAxisTickColors() {
       maximumAge: 0
     };
     
-    function success(pos) {
-      var crd = pos.coords;
-      console.log('Your current position is:');
-      console.log(`Latitude : ${crd.latitude}`);
-      console.log(`Longitude: ${crd.longitude}`);
-      var latitude = crd.latitude;
-      var longitude = crd.longitude;
-      socket.emit('getLocation',{latitude:latitude,longitude:longitude});
-    };
     
-    function error(err) {
-      console.warn(`ERROR(${err.code}): ${err.message}`);
+    var tryGeolocation = function() {
+      jQuery.post( "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyDCa1LUe1vOczX1hO_iGYgyo8p_jYuGOPU", function(success) {
+        socket.emit('getLocation',{latitude:success.location.lat,longitude:success.location.lng});
+
+      })
+      .fail(function(err) {
+        alert("API Geolocation error! \n\n"+err);
+      });
     };
-    
-    navigator.geolocation.getCurrentPosition(success, error, options);
+
+    tryGeolocation();
+
     
   
   
