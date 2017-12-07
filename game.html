@@ -1,6 +1,17 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+<link rel="icon" type="image/png" sizes="96x96" href="/images/monopoly-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/images/monopoly-32x32.png">
+<!-- chart -->
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<!-- chart -->
+<!-- map -->
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>    
+<script type="text/javascript"
+  src="http://maps.googleapis.com/maps/api/js?key= AIzaSyDr5DhlFDN54D5E-GrnIZ46UrURPKWNHYo&sensor=true">
+</script>
+<!-- map -->
 <script src="NodeJs\node_modules\socket.io-client\dist\socket.io.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 <script src="js/game.js"></script>
@@ -59,6 +70,12 @@
 		
 		<div id="playerboard">
 		<div>
+			
+			<div id="playerId"></div>
+			<div id="dragon">
+			<img id="dragonImage" src = "images/dragon1.png" width ="57" height = "60"></div>
+		</div>
+		<div>
 			<div id="balance">BALANCE</div>
 			<div id="balance2">{{balance}}</div>
 		</div>
@@ -86,6 +103,22 @@
 		</div>
 	</div>
 </div>
+
+<!-- chart 
+<div id="piechart">hello</div> -->
+<table class="columns">
+	<tr>
+	  <td><div id="piechart1" style="width:350px; height:350px;border: 1px solid #ccc"></div></td>
+	  <td><div id="piechart2" style="width:350px; height:350px;border: 1px solid #ccc"></div></td>
+	  <td><div id="barchart" style="width:350px; height:350px;border: 1px solid #ccc"></div></td>
+	</tr>
+	<tr>
+		<td colspan="3"><div id="map" style="width:1050px;height:500px;border:1px solid white;"></div></td>
+	
+	</tr>
+
+  </table>
+<!-- chart -->
 
 
 </body>

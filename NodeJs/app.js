@@ -8,9 +8,11 @@ var dbResponse;
 var ObjectID = require('mongodb').ObjectID;
 var requestAction = false;
 var isAlexa = false;
+var buildAction = false;
 //Handle from post data
 var bodyParser = require('body-parser');
 var connections = [];
+var locations = [];
 var numberOfConnections = 2;
 
 app.use(bodyParser.urlencoded({ extended: true })); 
@@ -68,6 +70,15 @@ io.sockets.on('connection', function(socket) {
 
   //socket request handlers
 
+  socket.on('getLocation', function (data){
+    locations.push([data.latitude,data.longitude]);
+    console.log(locations.length,numberOfConnections);
+
+    if(locations.length == numberOfConnections){
+      io.sockets.emit('updateLocation',{data:locations});
+    }
+  });
+
   socket.on('rollDice', function (data) {
     
       isAlexa = false;
@@ -77,6 +88,10 @@ io.sockets.on('connection', function(socket) {
   socket.on('buy', function (data) {
       getDocumentFromDb(gameId, processBuyProperty,data);
     });
+
+  socket.on('build', function (data) {
+      getDocumentFromDb(gameId, processBuildProperty,data);
+  });
 
   socket.on('closeConnection',function(){
       console.log('Client disconnects'  + socket.id);
@@ -101,7 +116,7 @@ function processRollDice(response,socketData){
           var diceNumber = Number(socketData.rollNumber);
         var action="none";
         var from = dbResponse.players[playerId-1].currentPositionInBoard;
-        var nextPosition = dbResponse.players[playerId-1].currentPositionInBoard = findNextPositionInBoard(dbResponse,playerId,diceNumber)    
+        var nextPosition = dbResponse.players[playerId-1].currentPositionInBoard = findNextPositionInBoard(dbResponse,playerId,diceNumber);    
         var property = getProperty(dbResponse,nextPosition);
         var message = "";
         if(property.color!="none")
@@ -111,21 +126,23 @@ function processRollDice(response,socketData){
             case "noone":
                       
                       requestAction = true;
+                      buildAction = false;
                       action="buy";
                       dbResponse.nextTurn = "noone";
                       break;
             case playerId:
-                      message = "player"+playerId+" Landing at his property. He is safe.";
+                      message = "Player"+playerId+" Landing at his property. He is safe.";
+                      buildAction = true;
                       requestAction = false;
                       action="build";
-                      dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
+                      dbResponse.nextTurn = "noone";
                       break;
             default:
-                      
-                      dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
                       requestAction = false;
+                      buildAction = false;
+                      dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
                       var rent= property.rent[property.currentState];
-                      message = "player"+playerId+" paid rent of $"+rent+" to player"+property.owner;
+                      message = "Player"+playerId+" paid rent of $"+rent+" to player"+property.owner;
                       dbResponse.players[playerId-1].balance -= rent;
                       dbResponse.players[playerId-1].networth -= rent;
                       dbResponse.players[property.owner-1].balance += rent;
@@ -192,13 +209,14 @@ function processRollDice(response,socketData){
                 }     
             }
           requestAction = false;
+          buildAction = false;
           dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
         }
 
         //todo
         //if player cross start(id : 1), add 200 to bal and nw
         if (from > nextPosition) {
-            console.log("congrats you have completed a round")
+            console.log("Congrats, You have completed a round")
             dbResponse.players[playerId-1].balance += 200;
             dbResponse.players[playerId-1].networth += 200;
         }
@@ -207,12 +225,12 @@ function processRollDice(response,socketData){
         if(isAlexa){
           message = "Triggered through Alexa" + message;
         }
-        io.sockets.emit('move', { requestAction: requestAction,action:action,message:message, from:from,to:nextPosition,playerId : playerId, diceNumber:diceNumber, dbResponse: dbResponse });
+io.sockets.emit('move', { requestAction: requestAction,buildAction: buildAction, action:action,message:message, from:from,to:nextPosition,playerId : playerId, diceNumber:diceNumber, dbResponse: dbResponse });
     }
 
 function processBuyProperty(response,socketData){
     dbResponse = JSON.parse(response);
-    playerId = socketData.playerId;   
+    playerId = Number(socketData.playerId); 
     var currentPosition = dbResponse.players[playerId-1].currentPositionInBoard 
     var property = getProperty(dbResponse,currentPosition); 
         
@@ -229,7 +247,25 @@ function processBuyProperty(response,socketData){
     }
     dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
     updateDocument(gameId, dbResponse);
-    io.sockets.emit('nextPlayerTurn',{dbResponse:dbResponse,message:message,});
+    io.sockets.emit('nextPlayerTurn',{dbResponse:dbResponse,message:message});
+}
+
+function processBuildProperty(response, socketData){
+    dbResponse = JSON.parse(response);
+    playerId = Number(socketData.playerId);  
+
+    if(socketData.answer=="yes")
+    {
+        var currentPosition = dbResponse.players[playerId-1].currentPositionInBoard;
+        var property = getProperty(dbResponse,currentPosition); 
+        dbResponse.players[playerId-1].balance -= property.buildValue;
+        dbResponse.properties[currentPosition-1].currentState += 1;
+        message = "Player"+playerId+" build property on "+property.name;
+    }
+
+    dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
+    updateDocument(gameId, dbResponse);
+    io.sockets.emit('nextPlayerTurn',{dbResponse:dbResponse,message:message});
 }
 
 function findNextTurn(dbResponse,playerId){
@@ -284,6 +320,7 @@ function removePlayer(item)
 {
 var index = connections.indexOf(item);
 connections.splice(index, 1);
+locations = [];
 }
 
 
@@ -304,7 +341,7 @@ function createNewDocumentInDb(dbResponse, callback) {
 
 function startGame(gameId)
 {
-    console.log('starting game');
+    console.log('Starting game');
     //tell all clients to start the game and send their respective player id 
     for(var i=0; i<connections.length;i++)
     {

@@ -1,5 +1,5 @@
  html{
-    background: black;
+    background: #131212;
     color: white;
   }
 
@@ -199,3 +199,9 @@
     font-family: Game of Thrones;
     src: url('Game of Thrones.ttf');
 }
+
+#game
+{
+  height: 800px;
+}
+
