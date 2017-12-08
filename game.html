@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<link rel="icon" type="image/png" sizes="96x96" href="/images/monopoly-96x96.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/images/monopoly-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="images/monopoly-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="images/monopoly-32x32.png">
 <!-- chart -->
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <!-- chart -->
@@ -101,6 +101,26 @@
 		<div id="showPropertiesDialog">You don't own any properties.
 		</div>
 		</div>
+		<div>
+		  <section>
+	      <div class="headerBar">
+	           <p class="title">CHATROOM</p>
+	      </div>
+	      <div class="chatbox">    
+            <div class="chatlogs" id ="chatlogs">
+              <div class="chat"></div>
+              <div class="chatright"></div>
+            </div>    
+
+            <div class="chat-form">
+                <div id="inputDiv">
+                    <textarea class="input" placeholder="Type a message"></textarea>
+                </div>
+            </div>
+	      </div>
+    </section>
+	</div>
+			
 	</div>
 </div>
 
@@ -119,6 +139,22 @@
 
   </table>
 <!-- chart -->
+<script type="text/javascript">
+    var ButtonClicked = false;
+    $("textarea").keypress(function(event) {
+    // If the enter key is pressed
+      if(event.which === 13) {
+        // Ignore the default function of the enter key(Dont go to a new line)
+        event.preventDefault();
+        ButtonClicked = false;
+        // Call the method for sending a message, pass in the text from the user
+      //  appendChat(this.value);
+        send(this.value);
+        // Clear the text area
+        this.value = "";
+      }
+     });
+ </script>
 
 
 </body>

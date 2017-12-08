@@ -179,7 +179,7 @@ function processPlayerLanding(playerId,from,to,dbResponse,requestAction, buildAc
             var propertyName = dbResponse.properties[to-1].name;
             var value = dbResponse.properties[to-1].buildValue;
             response = 2;
-            createBox('Do you want to build a property on '+propertyName+' for $'+value + '?', response);
+            createBox('Do you want to build a castle on '+propertyName+' for $'+value + '?', response);
           }
       }
 }
@@ -208,6 +208,16 @@ function showPropertiesPopup()
 {
   document.getElementById('showPropertiesDialog').innerHTML="";
   var i;
+  document.getElementById('showPropertiesDialog').style.display="block";
+  var initdiv = document.createElement('div');
+  initdiv.innerHTML = "Property";
+  initdiv.className = 'box';
+  var initdiv1 = document.createElement('div');
+  initdiv1.innerHTML = "Price";
+  initdiv1.className = 'box';
+  document.getElementById('showPropertiesDialog').appendChild(initdiv);
+  document.getElementById('showPropertiesDialog').appendChild(initdiv1);
+
   for(i=1;i<=26;i++)
   {
       if(sessionStorage.playerId == dbResponse.properties[i-1].owner)

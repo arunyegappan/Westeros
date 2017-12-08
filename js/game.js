@@ -1,6 +1,36 @@
 var socket = io.connect('http://localhost:8080');
 var app = angular.module("westeros", []); 
 var dbResponse;
+var chatMsg;
+
+function send(text) {
+  playerId = Number(sessionStorage.playerId);
+  socket.emit('chat message',{text: text, playerId:playerId});
+}
+
+function appendChatLeft(text,playerId) {
+  const chatLogs = document.querySelector('.chatlogs');
+  const chat1 = document.createElement('div');
+  chat1.className = "chat friend";
+  chat1.innerHTML = '<img src="images/dragon'+playerId+'.png" height="25" width = "25"/><p class="chat-message">'+text+'</p>';
+  chatLogs.appendChild(chat1); 
+}
+
+// function appendChatRight(text, chatMsg) {
+//   const chatLogs = document.querySelector('.chatlogs');
+//   const chat1 = document.createElement('div');
+//   chat1.className = "chat friend right";
+//    if(chatMsg == 1) {
+//    chat1.innerHTML = `<p class=\'chat-message\'>${text}</p><img src=\'images/dragon1.png\'>`;
+//    } else {
+//    chat1.innerHTML = `<p class=\'chat-message\'>${text}</p><img src=\'images/dragon2.png\'>`;
+//    }   
+//   chatLogs.appendChild(chat1); 
+// }
+
+socket.on('chat message', function(msg){
+  appendChatLeft(msg.msg,msg.playerId);
+});
 
 app.controller("myCtrl", function($scope) {
       $scope.message = "";
@@ -122,7 +152,7 @@ if("1" == dbResponse.properties[i-1].owner)
 var data = google.visualization.arrayToDataTable(array1);
 
    var options = {
-     title: 'Player 1\'s Properties',pieSliceText: "none",
+     title: 'Player 1\'s Properties',pieSliceText: "none",colors: ['#FF7F50', '#DC143C', '#E9967A', '#8B0000']
    };
    var chart = new google.visualization.PieChart(document.getElementById('piechart1'));
  chart.draw(data, options);
@@ -143,7 +173,7 @@ var data = google.visualization.arrayToDataTable(array1);
   var data = google.visualization.arrayToDataTable(array1);
   
      var options = {
-       title: 'Player 2\'s Properties',pieSliceText: "none",
+       title: 'Player 2\'s Properties',pieSliceText: "none",colors: ['#556B2F', '#BDB76B', '#228B22', '#8FBC8F']
      };
      var chart = new google.visualization.PieChart(document.getElementById('piechart2'));
    chart.draw(data, options);
@@ -156,15 +186,18 @@ function drawAxisTickColors() {
       
       var data = google.visualization.arrayToDataTable([
         ['Player', 'Balance', { role: 'style' }],
-        ['Player 1', dbResponse.players[0].balance, '#b87333'],            // RGB value
-        ['Player 2', dbResponse.players[1].balance, 'silver'],            // English color name
+        ['Player 1', dbResponse.players[0].balance, '#CD5C5C'],            // RGB value
+        ['Player 2', dbResponse.players[1].balance, '#3CB371'],            // English color name
 
       //['Platinum', 21.45, 'color: #e5e4e2' ], // CSS-style declaration
      ]);
       
+      var options = {
+       title: 'Balance'
+     };
 
       var chart = new google.visualization.ColumnChart(document.getElementById('barchart'));
-      chart.draw(data);
+      chart.draw(data,options);
     }
 
 

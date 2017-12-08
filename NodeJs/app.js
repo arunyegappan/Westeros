@@ -9,6 +9,13 @@ var ObjectID = require('mongodb').ObjectID;
 var requestAction = false;
 var isAlexa = false;
 var buildAction = false;
+
+io.on('connection', function(socket){
+  socket.on('chat message', function(msg){
+    io.emit('chat message', {msg:msg.text,playerId:msg.playerId});
+  });
+});
+
 //Handle from post data
 var bodyParser = require('body-parser');
 var connections = [];
@@ -260,7 +267,7 @@ function processBuildProperty(response, socketData){
         var property = getProperty(dbResponse,currentPosition); 
         dbResponse.players[playerId-1].balance -= property.buildValue;
         dbResponse.properties[currentPosition-1].currentState += 1;
-        message = "Player"+playerId+" build property on "+property.name;
+        message = "Player"+playerId+" built a castle on "+property.name;
     }
 
     dbResponse.nextTurn = findNextTurn(dbResponse,playerId);
